@@ -94,13 +94,13 @@ class TwoSteps(TaskType):
         res = dict()
         for language in LANGUAGES:
             source_ext = LANGUAGE_TO_SOURCE_EXT_MAP[language]
-            header_ext = LANGUAGE_TO_HEADER_EXT_MAP.get(language, None)
+            header_ext = LANGUAGE_TO_HEADER_EXT_MAP.get(language)
             source_filenames = []
-            # Manager 
+            # Manager
             manager_source_filename = "manager%s" % source_ext
             source_filenames.append(manager_source_filename)
             # Manager's header.
-            if header_ext != None:
+            if header_ext is not None:
                 manager_header_filename = "manager%s" % header_ext
                 source_filenames.append(manager_header_filename)
 
@@ -108,7 +108,7 @@ class TwoSteps(TaskType):
                 source_filename = filename.replace(".%l", source_ext)
                 source_filenames.append(source_filename)
                 # Headers
-                if header_ext != None:
+                if header_ext is not None:
                     header_filename = filename.replace(".%l", header_ext)
                     source_filenames.append(header_filename)
 
@@ -127,7 +127,7 @@ class TwoSteps(TaskType):
         # before accepting it.
         language = job.language
         source_ext = LANGUAGE_TO_SOURCE_EXT_MAP[language]
-        header_ext = LANGUAGE_TO_HEADER_EXT_MAP.get(language, None)
+        header_ext = LANGUAGE_TO_HEADER_EXT_MAP.get(language)
 
         # TODO: here we are sure that submission.files are the same as
         # task.submission_format. The following check shouldn't be
@@ -154,7 +154,7 @@ class TwoSteps(TaskType):
         files_to_get[manager_filename] = \
             job.managers[manager_filename].digest
         # Manager's header.
-        if header_ext != None:
+        if header_ext is not None:
             manager_filename = "manager%s" % header_ext
             source_filenames.append(manager_filename)
             files_to_get[manager_filename] = \
@@ -166,7 +166,7 @@ class TwoSteps(TaskType):
             source_filenames.append(source_filename)
             files_to_get[source_filename] = file_.digest
             # Headers (fixing compile error again here).
-            if header_ext != None:
+            if header_ext is not None:
                 header_filename = filename.replace(".%l", header_ext)
                 source_filenames.append(header_filename)
                 files_to_get[header_filename] = \
@@ -331,7 +331,8 @@ class TwoSteps(TaskType):
                         if TwoSteps.CHECKER_FILENAME not in job.managers:
                             logger.error("Configuration error: missing or "
                                          "invalid comparator (it must be "
-                                         "named `checker')", extra={"operation": job.info})
+                                         "named `checker')",
+                                         extra={"operation": job.info})
                             success = False
                         else:
                             second_sandbox.create_file_from_storage(
@@ -342,7 +343,8 @@ class TwoSteps(TaskType):
                             try:
                                 second_sandbox.remove_file("input.txt")
                             except OSError as e:
-                                assert not second_sandbox.file_exists("input.txt")
+                                assert not second_sandbox.file_exists(
+                                    "input.txt")
                             second_sandbox.create_file_from_storage(
                                 "input.txt",
                                 job.input)
@@ -352,8 +354,8 @@ class TwoSteps(TaskType):
                                   "input.txt", "res.txt", "output.txt"]])
                             if success:
                                 try:
-                                    outcome, text = \
-                                        extract_outcome_and_text(second_sandbox)
+                                    outcome, text = extract_outcome_and_text(
+                                        second_sandbox)
                                 except ValueError, e:
                                     logger.error("Invalid output from "
                                                  "comparator: %s", e.message,
@@ -363,7 +365,6 @@ class TwoSteps(TaskType):
                         raise ValueError("Uncrecognized first parameter"
                                          " `%s' for TwoSteps tasktype." %
                                          self.parameters[0])
-                        success = False
 
         # Whatever happened, we conclude.
         job.success = success
